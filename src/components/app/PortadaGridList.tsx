@@ -4,7 +4,11 @@ import { Link } from 'react-router-dom'
 
 const { Title } = Typography
 
-const PortadaGridList = ({ portadas, title, onChangePage, isLoading }) => {
+const PortadaGridList = ({ portadas, title, onChangePage, isLoading, favorites }) => {
+
+    const isInFavorites = (id) => {
+        return favorites.findIndex(f => f.animeId === id) !== -1
+    }
 
     return (
         <>
@@ -16,8 +20,8 @@ const PortadaGridList = ({ portadas, title, onChangePage, isLoading }) => {
                 <div className="px-5 my-10 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 space-x-4 space-y-2">
                     {
                         portadas && portadas.map(anime => (
-                            <Link to={`/animes/${anime.mal_id}`}>
-                                <PortadaAnime anime={anime} />
+                            <Link to={`/animes/${anime.mal_id}`} key={anime.mal_id}>
+                                <PortadaAnime anime={anime} isFavorite={isInFavorites(anime.mal_id)} />
                             </Link>
                         ))
                     }

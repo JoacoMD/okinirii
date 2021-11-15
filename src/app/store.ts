@@ -1,10 +1,8 @@
 import { configureStore, ThunkAction, Action } from '@reduxjs/toolkit';
-import counterReducer from '../components/counter/counterSlice';
 import animeReducer from './animeSlice';
 
 export const store = configureStore({
   reducer: {
-    counter: counterReducer,
     animes: animeReducer
   },
 });

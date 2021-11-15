@@ -3,37 +3,40 @@ import { useParams } from 'react-router-dom'
 import { useEffect, useState, useContext } from 'react'
 import { fetchAnime, fetchAnimePictures, ResultAnime } from '../../app/services/anime.service'
 import { Picture } from '../../classes/picture'
-import { addAnimeToList, addFavorite, getComentariosByAnimeId, removeAnimeFromFavorites, removeAnimeFromList, saveComentario } from '../../app/services/db.service'
+import { getComentariosByAnimeId, saveComentario } from '../../app/services/db.service'
+import { addFavorite, removeFavorite} from '../../app/animeSlice'
 import ComentarioCard from './ComentarioCard'
 import { UserContext } from '../../context/UserContext'
 import { Comentario } from '../../classes/comentario'
-import { CheckCircleOutlined, HeartFilled, HeartOutlined, MinusCircleFilled, PlusCircleFilled, PlusOutlined } from '@ant-design/icons'
-import { Tooltip } from 'antd'
+import { HeartFilled, HeartOutlined } from '@ant-design/icons'
+import { Space, Tooltip } from 'antd'
+import { useForm } from 'antd/lib/form/Form'
+import { useDispatch, useSelector } from 'react-redux'
+import { selectAnimes } from '../../app/animeSlice'
 
 const { Title } = Typography
 
 const AnimeDetail = () => {
 
-    const { user, lists } = useContext(UserContext)
+    const { user } = useContext(UserContext)
+    const { favorites } = useSelector(selectAnimes)
     const { id } = useParams()
     const [anime, setAnime] = useState<ResultAnime>()
     const [pictures, setPictures] = useState<Picture[]>()
-    // const [news, setNews] = useState<any>()
     const [comentarios, setComentarios] = useState<Comentario[]>([])
     const [isInFavorites, setInFavorites] = useState(false)
-    const [isInList, setInList] = useState(false)
+    const [formComentario] = useForm()
+    const [isEnviandoComentario, setEnviandoComentario] = useState(false)
+    const dispatch = useDispatch()
 
     useEffect(() => {
         fetch(id)
+         // eslint-disable-next-line
     }, [id])
 
     useEffect(() => {
-        console.log(lists)
-        if (lists) {
-            setInFavorites(lists.favorites.findIndex(a => a.animeId === +id) !== -1)
-            setInList(lists.list.findIndex(a => a.animeId === +id) !== -1)
-        }
-    }, [lists])
+        setInFavorites(favorites.findIndex(a => a.animeId === +id) !== -1)
+    }, [favorites, id])
 
     const fetchComentarios = async (id) => {
         const comentarios = await getComentariosByAnimeId(id)
@@ -48,56 +51,33 @@ const AnimeDetail = () => {
             console.log(data)
         })
         fetchComentarios(id)
-        // fetchAnimeNews(id).then(({ data }) => {
-        // setNews(data)
-        // console.log(data)
-        // });
     }
 
-    const addToMyFavorites = () => user?.userId && addFavorite(user.userId, anime).then()
+    const addToMyFavorites = () => anime && user?.userId && dispatch(addFavorite({animeId: anime?.mal_id, image: anime?.image_url, title: anime?.title}))
 
-    const addToMyList = () => user?.userId && addAnimeToList(user.userId, anime).then()
-    
-    const removeFromFavorites = () => user?.userId && removeAnimeFromFavorites(user.userId, +id)
-
-    const removeFromList = () => user?.userId && removeAnimeFromList(user.userId, +id)
+    const removeFromFavorites = () => user?.userId && dispatch(removeFavorite(+id))
 
     const onAgregarComentario = ({ message }) => {
-        saveComentario({
-            message,
-            user,
-            animeId: +id,
-            date: new Date()
+        formComentario.validateFields().then(() => {
+            setEnviandoComentario(true)
+            saveComentario({
+                message,
+                user,
+                animeId: +id,
+                date: new Date()
+            })
+                .then(() => {
+                    fetchComentarios(id)
+                    formComentario.resetFields()
+                })
+                .finally(() => setEnviandoComentario(false))
         })
-            .then(() => fetchComentarios(id))
     }
 
     return (
         <div className="grid grid-rows-6 grid-flow-col gap-4">
             <div className="row-span-6 max-w-xs">
                 <img className="mx-auto shadow-md w-full" src={anime?.image_url} alt={`Portada de ${anime?.title}`}></img>
-                {user?.userId && <div className="my-3">
-                    {
-                        isInFavorites ?
-                            <Tooltip title="Remover de favoritos">
-                                <Button icon={<HeartFilled className="text-red-500" />} shape="circle" onClick={removeFromFavorites} />
-                            </Tooltip>
-                            :
-                            <Tooltip title="Agregar a favoritos">
-                                <Button icon={<HeartOutlined className="text-red-500" />} shape="circle" onClick={addToMyFavorites} />
-                            </Tooltip>
-                    }
-                    {
-                        isInList ?
-                            <Tooltip title="Remover de mi lista">
-                                <Button icon={<CheckCircleOutlined/>} shape="circle" onClick={removeFromList} />
-                            </Tooltip>
-                            :
-                            <Tooltip title="Agregar a mi lista">
-                                <Button icon={<PlusOutlined className="text-red-500" />} shape="circle" onClick={addToMyList} />
-                            </Tooltip>
-                    }
-                </div>}
                 <Divider orientation="left">Informacion</Divider>
                 <p><b>Tipo:</b> {anime?.type}</p>
                 <p><b>Episodios:</b> {anime?.episodes}</p>
@@ -122,7 +102,29 @@ const AnimeDetail = () => {
                             <h4 className="absolute px-2 py-1">Rank</h4>
                             <h3 className="absolute px-2">#{anime?.rank}</h3>
                         </div>
-                    </div>
+                        {user?.userId && <div className="my-3">
+                            <Space>
+                                {
+                                    isInFavorites ?
+                                        <Tooltip title="Remover de favoritos">
+                                            <Button
+                                                danger
+                                                type="primary"
+                                                shape="circle"
+                                                icon={<HeartFilled />}
+                                                onClick={removeFromFavorites} />
+                                        </Tooltip>
+                                        :
+                                        <Tooltip title="Agregar a favoritos">
+                                            <Button
+                                                danger
+                                                icon={<HeartOutlined />}
+                                                shape="circle"
+                                                onClick={addToMyFavorites} />
+                                        </Tooltip>
+                                }
+                            </Space>
+                        </div>}   </div>
                     <Divider type="horizontal" orientation="left">Synopsis</Divider>
                     <Typography.Paragraph className="px-4">{anime?.synopsis}</Typography.Paragraph>
                 </Typography>
@@ -137,15 +139,30 @@ const AnimeDetail = () => {
                 </div>
                 <Divider type="horizontal" orientation="left">Comentarios</Divider>
                 <div>
-                    {user?.userId && <Form onFinish={onAgregarComentario}>
-                        <Card>
-                            <Form.Item
-                                name="message">
-                                <Input.TextArea placeholder="Escribe un comentario..." />
-                            </Form.Item>
-                            <Button htmlType="submit" type="primary" className="mt-2">Agregar comentario</Button>
-                        </Card>
-                    </Form>}
+                    {user?.userId &&
+                        <Form
+                            onFinish={onAgregarComentario}
+                            form={formComentario}
+                        >
+                            <Card>
+                                <Form.Item
+                                    name="message"
+                                    rules={[
+                                        { required: true, message: 'Debe escribir el comentario antes de enviarlo.' },
+                                        { min: 5, message: 'El comentario debe tener al menos 5 caracteres' }
+                                    ]}
+                                >
+                                    <Input.TextArea minLength={3} placeholder="Escribe un comentario..." />
+                                </Form.Item>
+                                <Button
+                                    disabled={isEnviandoComentario}
+                                    htmlType="submit"
+                                    type="primary"
+                                    className="mt-2">
+                                    Agregar comentario
+                                </Button>
+                            </Card>
+                        </Form>}
                     <List
                         header={`${comentarios?.length} comentarios`}
                         itemLayout="horizontal"
@@ -156,10 +173,6 @@ const AnimeDetail = () => {
                             </li>
                         )}
                     />
-                    {/* {comentarios && comentarios?.length > 0 && comentarios?.map(comentario => ( */}
-                    {/* <ComentarioCard comentario={comentario} /> */}
-                    {/* ))} */}
-                    {/* {(!comentarios || comentarios?.length === 0) && <p>No hay comentarios.</p>} */}
                 </div>
             </div>
         </div>

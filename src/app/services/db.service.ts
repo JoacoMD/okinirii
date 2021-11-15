@@ -1,4 +1,3 @@
-import { firestore } from 'firebase'
 import { Comentario } from '../../classes/comentario'
 import { db } from '../../firebase/FirebaseConfig'
 import { ResultAnime } from './anime.service'

@@ -1,24 +1,15 @@
 import { Button } from 'antd'
-import { useEffect, useContext } from 'react'
+import { useContext } from 'react'
 import { Link, useHistory } from 'react-router-dom'
 import { loginWithGoogleAuth } from '../../app/services/auth.service'
-import { getUserListsObs } from '../../app/services/db.service'
 import { UserContext } from '../../context/UserContext'
 import logo from '../../okinirii.png'
-import UserInfoNav from '../UserInfoNav'
+import UserInfoNav from './UserInfoNav'
 
 const NavBar = () => {
 
-    const { user, setUser, setLists } = useContext(UserContext)
+    const { user, setUser } = useContext(UserContext)
     const history = useHistory()
-
-    useEffect(() => {
-        if (user?.userId) {
-            getUserListsObs(user?.userId, (lists) => {
-                !lists.empty && setLists(lists.docs[0].data())
-            })
-        }
-    }, [user])
 
     const onLogin = () => {
         loginWithGoogleAuth(({ user }) => {
