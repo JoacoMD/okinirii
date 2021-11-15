@@ -31,10 +31,12 @@ export const getComentariosByAnimeId = async (id: number): Promise<Comentario[]>
     })
 }
 
-export const getUserLists = async userId => {
+const getUserLists = async userId => {
     const result = await userListsCollection.where('userId', '==', userId).limit(1).get()
     return result.empty ? null : result.docs[0]
 }
+
+export const getUserListsObs = (userId, callback) => userListsCollection.where('userId', '==', userId).onSnapshot(callback)
 
 export const addFavorite = async (userId: string, anime: any) => {
     const userList = await getUserLists(userId)
@@ -67,6 +69,20 @@ export const addAnimeToList = async (userId: string, anime: any) => {
             .catch(handleError)
     }
 }
+
+const removeAnimeFrom = listType => async (userId, animeId) => {
+    const userList = await getUserLists(userId)
+    debugger
+    if (userList) {
+        const data = userList.data()
+        listType === 'list' ?
+            updateUserLists({ list: data.list.filter(a => a.animeId !== animeId) }, userList.id).catch(handleError) :
+            updateUserLists({ favorites: data.favorites.filter(a => a.animeId !== animeId) }, userList.id).catch(handleError)
+    }
+}
+
+export const removeAnimeFromList = removeAnimeFrom('list')
+export const removeAnimeFromFavorites = removeAnimeFrom('favorites')
 
 const reduceAnime = (anime: ResultAnime) => {
     return {

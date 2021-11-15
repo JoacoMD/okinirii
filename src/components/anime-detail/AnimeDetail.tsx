@@ -3,11 +3,10 @@ import { useParams } from 'react-router-dom'
 import { useEffect, useState, useContext } from 'react'
 import { fetchAnime, fetchAnimePictures, ResultAnime } from '../../app/services/anime.service'
 import { Picture } from '../../classes/picture'
-import { addFavorite, getComentariosByAnimeId, saveComentario } from '../../app/services/db.service'
+import { addFavorite, getComentariosByAnimeId, removeAnimeFromFavorites, removeAnimeFromList, saveComentario } from '../../app/services/db.service'
 import ComentarioCard from './ComentarioCard'
 import { UserContext } from '../../context/UserContext'
 import { Comentario } from '../../classes/comentario'
-import moment from 'moment'
 import { HeartFilled, HeartOutlined, PlusCircleFilled, PlusOutlined } from '@ant-design/icons'
 import { Tooltip } from 'antd'
 
@@ -61,6 +60,10 @@ const AnimeDetail = () => {
                 .then()
         }
     }
+    
+    const removeFromFavorites = () => user?.userId && removeAnimeFromFavorites(user.userId, +id)
+
+    const removeFromList = () => user?.userId && removeAnimeFromList(user.userId, +id)
 
     const onAgregarComentario = ({ message }) => {
         saveComentario({
@@ -80,7 +83,7 @@ const AnimeDetail = () => {
                     {
                         isInFavorites ?
                             <Tooltip title="Remover de favoritos">
-                                <Button icon={<HeartFilled className="text-red-500" />} shape="circle" />
+                                <Button icon={<HeartFilled className="text-red-500" />} shape="circle" onClick={removeFromFavorites} />
                             </Tooltip>
                             :
                             <Tooltip title="Agregar a favoritos">
@@ -90,7 +93,7 @@ const AnimeDetail = () => {
                     {
                         isInList ?
                             <Tooltip title="Remover de mi lista">
-                                <Button icon={<PlusCircleFilled className="bg-red-500" />} shape="circle" />
+                                <Button icon={<PlusCircleFilled className="bg-red-500" />} shape="circle" onClick={removeFromList} />
                             </Tooltip>
                             :
                             <Tooltip title="Agregar a mi lista">
