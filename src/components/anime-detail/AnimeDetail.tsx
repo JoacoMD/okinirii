@@ -3,11 +3,11 @@ import { useParams } from 'react-router-dom'
 import { useEffect, useState, useContext } from 'react'
 import { fetchAnime, fetchAnimePictures, ResultAnime } from '../../app/services/anime.service'
 import { Picture } from '../../classes/picture'
-import { addFavorite, getComentariosByAnimeId, removeAnimeFromFavorites, removeAnimeFromList, saveComentario } from '../../app/services/db.service'
+import { addAnimeToList, addFavorite, getComentariosByAnimeId, removeAnimeFromFavorites, removeAnimeFromList, saveComentario } from '../../app/services/db.service'
 import ComentarioCard from './ComentarioCard'
 import { UserContext } from '../../context/UserContext'
 import { Comentario } from '../../classes/comentario'
-import { HeartFilled, HeartOutlined, PlusCircleFilled, PlusOutlined } from '@ant-design/icons'
+import { CheckCircleOutlined, HeartFilled, HeartOutlined, MinusCircleFilled, PlusCircleFilled, PlusOutlined } from '@ant-design/icons'
 import { Tooltip } from 'antd'
 
 const { Title } = Typography
@@ -54,12 +54,9 @@ const AnimeDetail = () => {
         // });
     }
 
-    const addToMyFavorites = () => {
-        if (user?.userId) {
-            addFavorite(user.userId, anime)
-                .then()
-        }
-    }
+    const addToMyFavorites = () => user?.userId && addFavorite(user.userId, anime).then()
+
+    const addToMyList = () => user?.userId && addAnimeToList(user.userId, anime).then()
     
     const removeFromFavorites = () => user?.userId && removeAnimeFromFavorites(user.userId, +id)
 
@@ -93,11 +90,11 @@ const AnimeDetail = () => {
                     {
                         isInList ?
                             <Tooltip title="Remover de mi lista">
-                                <Button icon={<PlusCircleFilled className="bg-red-500" />} shape="circle" onClick={removeFromList} />
+                                <Button icon={<CheckCircleOutlined/>} shape="circle" onClick={removeFromList} />
                             </Tooltip>
                             :
                             <Tooltip title="Agregar a mi lista">
-                                <Button icon={<PlusOutlined className="text-red-500" />} shape="circle" onClick={addToMyFavorites} />
+                                <Button icon={<PlusOutlined className="text-red-500" />} shape="circle" onClick={addToMyList} />
                             </Tooltip>
                     }
                 </div>}
