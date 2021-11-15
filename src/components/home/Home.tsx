@@ -1,4 +1,3 @@
-import { Button, Input } from 'antd';
 import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { fetchAnimes, selectAnimes } from '../../app/animeSlice';
@@ -13,12 +12,12 @@ const Home = () => {
     const dispatch = useAppDispatch()
 
     useEffect(() => {
-        dispatch(fetchAnimes(page))
+        if (state.pages.findIndex(p => p.pageNumber === page) !== -1) {
+            setAnimes(state.pages.find(p => p.pageNumber === page)?.content)
+        } else {
+            dispatch(fetchAnimes(page))
+        }
         // eslint-disable-next-line
-    }, [page])
-
-    useEffect(() => {
-        setAnimes(state.pages.find(p => p.pageNumber === page)?.content)
     }, [state, page])
 
     const onChangePage = (page) => {
@@ -28,22 +27,13 @@ const Home = () => {
     return (
         <>
             <div className="flex items-center">
-                <div className="flex w-96 mx-auto">
-                    <Input
-                        placeholder="Busca un anime"
-                    />
-                    <Button
-                        type="primary"
-                        className="mx-2">
-                        Buscar
-                    </Button>
-                </div>
             </div>
             <PortadaGridList
                 portadas={animes}
                 title="Top Animes"
                 onChangePage={onChangePage}
                 isLoading={state.loading}
+                favorites={state.favorites}
             ></PortadaGridList>
         </>
     )
