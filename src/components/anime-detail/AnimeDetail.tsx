@@ -1,20 +1,34 @@
-import { Button, Card, Divider, Form, Input, List, Typography } from 'antd/es'
+import { Button, Card, Divider, Form, Input, List, Typography, Image } from 'antd/es'
 import { useParams } from 'react-router-dom'
 import { useEffect, useState, useContext } from 'react'
 import { fetchAnime, fetchAnimePictures, ResultAnime } from '../../app/services/anime.service'
-import { Picture } from '../../classes/picture'
+import { Picture } from '../../interfaces/picture'
 import { getComentariosByAnimeId, saveComentario } from '../../app/services/db.service'
-import { addFavorite, removeFavorite} from '../../app/store/animeSlice'
+import { addFavorite, removeFavorite } from '../../app/store/animeSlice'
 import ComentarioCard from './ComentarioCard'
 import { UserContext } from '../../context/UserContext'
-import { Comentario } from '../../classes/comentario'
+import { Comentario } from '../../interfaces/comentario'
 import { HeartFilled, HeartOutlined } from '@ant-design/icons'
-import { Rate, Space, Tooltip } from 'antd'
+import { Space, Tooltip } from 'antd'
 import { useForm } from 'antd/lib/form/Form'
 import { useDispatch, useSelector } from 'react-redux'
 import { selectAnimes } from '../../app/store/animeSlice'
 
 const { Title } = Typography
+
+const createDetailItem = (name: string, key: string) => ({ name, data: (o: any) => o[key] })
+const createDetailListItem = (name: string, key: string) => ({ name, data: (o: any) => o[key].map(o => o.name).join(', ') })
+
+const detailListItems = [
+    createDetailItem('Tipo', 'type'),
+    createDetailItem('Estado', 'status'),
+    createDetailItem('Estreno', 'premiered'),
+    createDetailListItem('Productores', 'producers'),
+    createDetailItem('Fuente', 'source'),
+    createDetailListItem('Género', 'genres'),
+    createDetailItem('Duración', 'duration'),
+    createDetailItem('Rating', 'rating')
+]
 
 const AnimeDetail = () => {
 
@@ -31,29 +45,20 @@ const AnimeDetail = () => {
 
     useEffect(() => {
         fetch(id)
-         // eslint-disable-next-line
+        // eslint-disable-next-line
     }, [id])
 
     useEffect(() => {
         setInFavorites(favorites.findIndex(a => a.animeId === +id) !== -1)
     }, [favorites, id])
 
-    const fetchComentarios = async (id) => {
-        const comentarios = await getComentariosByAnimeId(id)
-        setComentarios(comentarios)
-    }
-
     const fetch = async (id: number) => {
-        const response = await fetchAnime(id);
-        setAnime(response.data)
-        fetchAnimePictures(id).then(({ data }) => {
-            setPictures(data.pictures)
-            console.log(data)
-        })
-        fetchComentarios(id)
+        fetchAnime(id).then(({ data }) => setAnime(data));
+        fetchAnimePictures(id).then(({ data }) => setPictures(data.pictures))
+        getComentariosByAnimeId(id).then(setComentarios)
     }
 
-    const addToMyFavorites = () => anime && user?.userId && dispatch(addFavorite({animeId: anime?.mal_id, image: anime?.image_url, title: anime?.title}))
+    const addToMyFavorites = () => anime && user?.userId && dispatch(addFavorite({ animeId: anime?.mal_id, image: anime?.image_url, title: anime?.title }))
 
     const removeFromFavorites = () => user?.userId && dispatch(removeFavorite(+id))
 
@@ -67,7 +72,7 @@ const AnimeDetail = () => {
                 date: new Date()
             })
                 .then(() => {
-                    fetchComentarios(id)
+                    getComentariosByAnimeId(id).then(setComentarios)
                     formComentario.resetFields()
                 })
                 .finally(() => setEnviandoComentario(false))
@@ -77,18 +82,19 @@ const AnimeDetail = () => {
     return (
         <div className="grid grid-rows-6 grid-flow-col gap-4">
             <div className="row-span-6 max-w-xs">
-                <img className="mx-auto shadow-md w-full" src={anime?.image_url} alt={`Portada de ${anime?.title}`}></img>
+                <Image
+                    className="mx-auto shadow-md w-full"
+                    src={anime?.image_url}
+                    alt={`Portada de ${anime?.title}`}/>
                 <Divider orientation="left">Informacion</Divider>
-                <p><b>Tipo:</b> {anime?.type}</p>
-                <p><b>Episodios:</b> {anime?.episodes}</p>
-                <p><b>Estado:</b> {anime?.status}</p>
-                <p><b>Estreno:</b> {anime?.premiered}</p>
-                <p><b>Productores:</b> {anime?.producers.map(p => p.name)}</p>
-                <p><b>Estudios:</b> {anime?.type}</p>
-                <p><b>Fuente:</b> {anime?.source}</p>
-                <p><b>Genero:</b> {anime?.genres.map(g => g.name)}</p>
-                <p><b>Duracion:</b> {anime?.duration}</p>
-                <p><b>Rating:</b> {anime?.rating}</p>
+                {
+                    anime && detailListItems.map(({ name, data }) => (
+                        <p>
+                            <b>{name}: </b>
+                            {data(anime)}
+                        </p>
+                    ))
+                }
             </div>
             <div className="col-span-10 row-span-2 max-w-lg md:max-w-xl lg:max-w-3xl xl:max-w-6xl">
                 <Typography>
@@ -132,7 +138,7 @@ const AnimeDetail = () => {
                 <div className="grid grid-flow-col overflow-x-auto space-x-3 w-full">
                     {pictures?.map(p => (
                         <div className="w-60">
-                            <img src={p.small} alt="Imagen del anime" />
+                            <Image src={p.small} alt="Imagen del anime" />
                         </div>
                     ))}
 

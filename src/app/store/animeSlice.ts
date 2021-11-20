@@ -1,5 +1,5 @@
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { Anime } from '../../classes/anime';
+import { Anime } from '../../interfaces/anime';
 import { RootState } from './store'
 import { fetchTopAnimes } from '../services/anime.service';
 

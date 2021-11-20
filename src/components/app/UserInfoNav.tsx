@@ -8,10 +8,10 @@ const UserInfoNav = ({ user, logout }) => {
             <Menu mode="horizontal">
                 <SubMenu key="userInfo" title={<Avatar src={user?.picture}></Avatar>}>
                     <Menu.Item key="userInfo.profile">
-                        <Link to="user">Ir a mi perfil</Link>
+                        <Link to="/user">Ir a mi perfil</Link>
                     </Menu.Item>
                     <Menu.Item key="userInfo.logout" onClick={logout}>
-                        Cerrar sesi&oacute;n
+                        Cerrar sesión
                     </Menu.Item>
                 </SubMenu>
             </Menu>

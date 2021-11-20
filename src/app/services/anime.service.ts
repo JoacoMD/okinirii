@@ -1,6 +1,6 @@
 import axios from "axios"
-import { Anime } from "../../classes/anime"
-import { Picture } from "../../classes/picture"
+import { Anime } from "../../interfaces/anime"
+import { Picture } from "../../interfaces/picture"
 
 interface Result {
     request_hash: string

@@ -2,9 +2,9 @@ import axios, { AxiosRequestConfig } from "axios";
 
 
 interface CustomRequestConfig extends AxiosRequestConfig {
-    onSuccess: Function | undefined,
-    onError: Function | undefined,
-    onFinally: Function | undefined
+    onSuccess?: Function,
+    onError?: Function,
+    onFinally?: Function
 }
 export const doAxios = (config: CustomRequestConfig) => axios.request({
     url: config.url,

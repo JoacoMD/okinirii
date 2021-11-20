@@ -1,5 +1,5 @@
 import { HeartFilled } from "@ant-design/icons"
-import { Card, Col, Row } from "antd"
+import { Card, Col, Image, Row } from "antd"
 import { useContext } from "react"
 import { useSelector } from "react-redux"
 import { selectAnimes } from "../../app/store/animeSlice"
@@ -15,7 +15,9 @@ const UserPage = () => {
                 <Row>
                     <Col span={5}>
                         <div className="bg-gray-700 rounded p-5">
-                            <img src={'https://yt3.ggpht.com/yti/APfAmoFY74G8nBu5oJSDbD-8VWUH23fSRs7l26vD69og7A=s88-c-k-c0x00ffffff-no-rj-mo'} className="border-2 border-white border-solid rounded-full mx-auto" />
+                            <div className="flex justify-center">
+                                <Image src={user?.picture} className="border-2 border-white border-solid rounded-full"/>
+                            </div>
                             <h2 className="text-white font-bold text-center">{user?.name}</h2>
                             <h2 className="text-gray-200 text-center">{user?.email}</h2>
                         </div>
@@ -25,7 +27,7 @@ const UserPage = () => {
                         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 space-x-4 ">
                             {favorites.map(f => (
                                 <Card
-                                    cover={<img className="h-80 object-cover" src={f.image} alt={`Portada de ${f.title}`} />}
+                                    cover={<Image preview={false} height={'20rem'} className="object-cover" src={f.image} alt={`Portada de ${f.title}`} />}
                                 >
                                     <Card.Meta
                                         title={f.title}

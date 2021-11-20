@@ -1,5 +1,5 @@
 import { createContext } from 'react' 
-import { User } from '../classes/user'
+import { User } from '../interfaces/user'
 
 interface IUserContext {
     user?: User, 
