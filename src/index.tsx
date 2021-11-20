@@ -1,19 +1,25 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import App from './App'
-import { store } from './app/store'
+import { store } from './app/store/store'
 import { Provider } from 'react-redux'
 import * as serviceWorker from './serviceWorker'
-import './tailwind.css'
+import 'tailwindcss/dist/tailwind.css'
 import 'antd/dist/antd.css'
 import './index.css'
 import ContextWrapper from './context/ContextWrapper';
+import persistStore from 'redux-persist/es/persistStore';
+import { PersistGate } from 'redux-persist/es/integration/react';
+
+let persistor = persistStore(store)
 
 ReactDOM.render(
   <React.StrictMode>
     <ContextWrapper>
       <Provider store={store}>
-        <App />
+        <PersistGate loading={null} persistor={persistor}>
+          <App />
+        </PersistGate>
       </Provider>
     </ContextWrapper>
   </React.StrictMode>,

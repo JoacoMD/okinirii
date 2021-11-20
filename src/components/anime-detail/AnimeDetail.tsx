@@ -4,15 +4,15 @@ import { useEffect, useState, useContext } from 'react'
 import { fetchAnime, fetchAnimePictures, ResultAnime } from '../../app/services/anime.service'
 import { Picture } from '../../classes/picture'
 import { getComentariosByAnimeId, saveComentario } from '../../app/services/db.service'
-import { addFavorite, removeFavorite} from '../../app/animeSlice'
+import { addFavorite, removeFavorite} from '../../app/store/animeSlice'
 import ComentarioCard from './ComentarioCard'
 import { UserContext } from '../../context/UserContext'
 import { Comentario } from '../../classes/comentario'
 import { HeartFilled, HeartOutlined } from '@ant-design/icons'
-import { Space, Tooltip } from 'antd'
+import { Rate, Space, Tooltip } from 'antd'
 import { useForm } from 'antd/lib/form/Form'
 import { useDispatch, useSelector } from 'react-redux'
-import { selectAnimes } from '../../app/animeSlice'
+import { selectAnimes } from '../../app/store/animeSlice'
 
 const { Title } = Typography
 

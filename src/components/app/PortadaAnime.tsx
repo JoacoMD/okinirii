@@ -2,8 +2,8 @@ import { Card, Tooltip } from "antd"
 import { HeartFilled, EllipsisOutlined } from '@ant-design/icons'
 import { useContext } from "react"
 import { UserContext } from "../../context/UserContext"
-import { addFavorite, removeFavorite } from "../../app/animeSlice"
 import { useDispatch } from "react-redux"
+import { addFavorite, removeFavorite } from "../../app/store/animeSlice"
 
 const { Meta } = Card
 

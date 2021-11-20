@@ -1,18 +1,24 @@
-import { useState } from 'react'
+import firebase from 'firebase'
+import { useEffect, useState } from 'react'
 import { UserContext } from "./UserContext"
-
-const initialLists = {
-    favorites: [],
-    list: []
-}
 
 const ContextWrapper = ({children}) => {
     const [user, setUser] = useState({})
-    const [lists, setLists]= useState(initialLists)
-
+    
+    useEffect(() =>{
+      firebase.auth().onAuthStateChanged(user => {
+          setUser({
+              userId: user?.uid,
+              email: user?.email,
+              picture: user?.photoURL,
+              name: user?.displayName
+          })
+      }) 
+    }, [])
+    
     return (
         <>
-            <UserContext.Provider value={{user, lists, setUser, setLists}}>
+            <UserContext.Provider value={{user, setUser}}>
                 {children}
             </UserContext.Provider>
         </>

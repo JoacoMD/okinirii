@@ -1,18 +1,9 @@
 import { createContext } from 'react' 
+import { User } from '../classes/user'
 
 interface IUserContext {
-    user?: {
-        userId?: string
-        name?: string
-        email?: string
-        picture?: string
-    },
-    lists?: {
-        favorites: any[]
-        list: any[]
-    }
-    setUser?: any,
-    setLists?:any
+    user?: User, 
+    setUser?: any
 }
 
 export const UserContext = createContext<IUserContext>({})

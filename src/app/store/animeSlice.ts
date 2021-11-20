@@ -1,7 +1,7 @@
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { Anime } from '../classes/anime';
+import { Anime } from '../../classes/anime';
 import { RootState } from './store'
-import { fetchTopAnimes } from './services/anime.service';
+import { fetchTopAnimes } from '../services/anime.service';
 
 interface AnimePage {
   pageNumber: number
@@ -22,7 +22,7 @@ const initialState: AnimeState = {
   error: undefined
 };
 
-export const selectAnimes = (state: RootState) => state.animes
+export const selectAnimes = (state: RootState) => state.anime
 
 export const fetchAnimes = createAsyncThunk(
     'animes/fetchAnimes',
