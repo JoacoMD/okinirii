@@ -4,8 +4,9 @@ import { Link } from 'react-router-dom'
 
 const UserInfoNav = ({ user, logout }) => {
     return (
-        <div>
-            <Menu mode="horizontal">
+        <div className="flex">
+            <p className="my-auto">{user?.name}</p>
+            <Menu mode="horizontal" style={{border: 'none'}} selectable={false}>
                 <SubMenu key="userInfo" title={<Avatar src={user?.picture}></Avatar>}>
                     <Menu.Item key="userInfo.profile">
                         <Link to="/user">Ir a mi perfil</Link>
